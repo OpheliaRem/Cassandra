@@ -78,8 +78,10 @@ static void terminal_putchar(char c) {
 	}
 }
 
+#define FIRST_COLUMN_FOR_TEXT 3
+
 static void terminal_backspace(void) {
-	if (terminal_column == 2) {
+	if (terminal_column == FIRST_COLUMN_FOR_TEXT) {
 		return;
 	}
 
@@ -109,11 +111,16 @@ static void terminal_write_string(const char* data) {
 #define PROMPT_SYMBOL '$'
 
 static void terminal_print_prompt(void) {
+	terminal_putchar(PROMPT_SYMBOL);
+	terminal_putchar(':');
+	terminal_putchar(' ');
+}
+
+static void terminal_print_new_prompt(void) {
 	if (terminal_column != 0) {
 		terminal_newline();
 	}
-	terminal_putchar(PROMPT_SYMBOL);
-	terminal_putchar(' ');
+	terminal_print_prompt();
 }
 
 #endif
