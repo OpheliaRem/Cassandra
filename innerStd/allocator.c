@@ -12,33 +12,59 @@ void initialize_heap() {
     }
 }
 
-void* allocate(size_t capacity) {
-    size_t index = 0;
-    while (index < HEAP_CAPACITY && alloc_bitmap[index]) {
-        ++index;
-    }
-    ++index; //acknowledge offset one byte to separate allocated areas
-
-    if (index >= HEAP_CAPACITY || HEAP_CAPACITY - index < capacity + 1) {
+void* allocate(size_t size) {
+    if (size == 0) {
         return NULL;
     }
 
-    for (size_t i = index; i < capacity; ++i) {
-        alloc_bitmap[i] = true;
-    }
-    alloc_bitmap[capacity] = false; //make offset one byte to separate allocated areas
+    size_t index = 0;
+    while (index < HEAP_CAPACITY) {
+       
+        while (index < HEAP_CAPACITY && alloc_bitmap[index]) {
+            index++;
+        }
+        
+        size_t start = index;
+        if (start >= HEAP_CAPACITY || HEAP_CAPACITY - start < size + 1) {
+            return NULL; // Not enough space
+        }
 
-    return &alloc_heap[index];
+        bool space_found = true;
+        for (size_t i = 0; i < size; i++) {
+            if (alloc_bitmap[start + i]) {
+                space_found = false;
+                index = start + i + 1;
+                break;
+            }
+        }
+
+        if (!space_found) {
+            continue;
+        }
+
+        for (size_t i = 0; i < size; i++) {
+            alloc_bitmap[start + i] = true;
+        }
+        
+        alloc_bitmap[start + size] = false;
+
+        return &alloc_heap[start];
+    }
+
+    return NULL;
 }
 
 void free(void* ptr) {
-    size_t index = (uint8_t*)ptr - alloc_heap;
+    if (ptr == NULL) {
+        return;
+    }
 
+    size_t index = (uint8_t*)ptr - alloc_heap;
     if (index >= HEAP_CAPACITY) {
         return;
     }
 
-    for (size_t i = index; alloc_bitmap[i] && i < HEAP_CAPACITY; ++i) {
+    for (size_t i = index; i < HEAP_CAPACITY && alloc_bitmap[i]; i++) {
         alloc_bitmap[i] = false;
     }
 }
