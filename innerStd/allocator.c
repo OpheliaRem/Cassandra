@@ -27,7 +27,7 @@ void* allocate(size_t size) {
         size_t start = index;
         if (start >= HEAP_CAPACITY || HEAP_CAPACITY - start < size + 1) {
             return NULL; // Not enough space
-        }
+        }`
 
         bool space_found = true;
         for (size_t i = 0; i < size; i++) {
