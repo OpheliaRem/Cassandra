@@ -1,9 +1,15 @@
-#ifndef _VGA_TERMINAL_H
-#define _VGA_TERMINAL_H
+#ifndef VGA_TERMINAL_H
+#define VGA_TERMINAL_H
 
 #include <stdint.h>
 #include <stddef.h>
-#include "../string/string.h"
+
+#define VGA_WIDTH   80
+#define VGA_HEIGHT  25
+#define VGA_MEMORY  0xB8000
+
+#define FIRST_COLUMN_FOR_TEXT 3
+#define PROMPT_SYMBOL '$'
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
@@ -24,103 +30,15 @@ enum vga_color {
 	VGA_COLOR_WHITE = 15,
 };
 
-static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
-	return fg | bg << 4;
-}
+void terminal_initialize(void);
+void terminal_set_color(uint8_t color);
 
-static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
-	return (uint16_t) uc | (uint16_t) color << 8;
-}
+void terminal_newline(void);
+void terminal_putchar(char c);
+void terminal_backspace(void);
+void terminal_write(const char* data);
+void terminal_writeln(const char* str);
 
-#define VGA_WIDTH   80
-#define VGA_HEIGHT  25
-#define VGA_MEMORY  0xB8000 
-
-static size_t terminal_row;
-static size_t terminal_column;
-static uint8_t terminal_color;
-static uint16_t* terminal_buffer = (uint16_t*)VGA_MEMORY;
-
-static void terminal_initialize(void) {
-	terminal_row = 0;
-	terminal_column = 0;
-	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-	
-	for (size_t y = 0; y < VGA_HEIGHT; y++) {
-		for (size_t x = 0; x < VGA_WIDTH; x++) {
-			const size_t index = y * VGA_WIDTH + x;
-			terminal_buffer[index] = vga_entry(' ', terminal_color);
-		}
-	}
-}
-
-static void terminal_set_color(uint8_t color) {
-	terminal_color = color;
-}
-
-static void terminal_put_entry_at(char c, uint8_t color, size_t x, size_t y) {
-	const size_t index = y * VGA_WIDTH + x;
-	terminal_buffer[index] = vga_entry(c, color);
-}
-
-static void terminal_newline(void) {
-	terminal_column = 0;
-    if (++terminal_row == VGA_HEIGHT) {
-        terminal_row = 0;
-    }
-}
-
-static void terminal_putchar(char c) {
-	terminal_put_entry_at(c, terminal_color, terminal_column, terminal_row);
-
-	if (++terminal_column == VGA_WIDTH) {
-		terminal_newline();
-	}
-}
-
-#define FIRST_COLUMN_FOR_TEXT 3
-
-static void terminal_backspace(void) {
-	if (terminal_column == FIRST_COLUMN_FOR_TEXT) {
-		return;
-	}
-
-	terminal_put_entry_at(' ', terminal_color, --terminal_column, terminal_row);
-}
-
-static void terminal_write(const char* data, size_t size) {
-	for (size_t i = 0; i < size && data[i]; i++) {
-		switch (data[i]) {
-			case '\n':
-				terminal_newline();
-				break;
-			case '\b':
-				terminal_backspace();
-				break;
-			default:
-				terminal_putchar(data[i]);
-				break;
-		}
-	}
-}
-
-static void terminal_write_string(const char* data) {
-	terminal_write(data, strlen(data));
-}
-
-#define PROMPT_SYMBOL '$'
-
-static void terminal_print_prompt(void) {
-	terminal_putchar(PROMPT_SYMBOL);
-	terminal_putchar(':');
-	terminal_putchar(' ');
-}
-
-static void terminal_print_new_prompt(void) {
-	if (terminal_column != 0) {
-		terminal_newline();
-	}
-	terminal_print_prompt();
-}
+void terminal_print_new_prompt(void);
 
 #endif
