@@ -6,8 +6,8 @@ void exception_handler(int vector, uint32_t error_code, Registers* regs) {
     (void)error_code;
     (void)regs;
 
-    terminal_write("An exception has occured");
+    terminal_write("An exception has occured\n");
     
-    stop_interrupts();
-    while (1) stop_processor();
+    asm volatile("cli");
+    asm volatile("hlt");
 }

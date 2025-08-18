@@ -62,12 +62,6 @@ isr_common:
     add $8, %esp
     iret
 
-stop_processor:
-    hlt
-
-stop_interrupts:
-    cli
-
 
 .section .data
     .global isr_stubs

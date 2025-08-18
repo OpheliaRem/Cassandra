@@ -6,7 +6,7 @@
 static uint8_t alloc_heap[HEAP_CAPACITY];
 static bool alloc_bitmap[HEAP_CAPACITY];
 
-void initialize_heap() {
+void init_heap() {
     for (int i = 0; i < HEAP_CAPACITY; ++i) {
         alloc_bitmap[i] = false;
     }

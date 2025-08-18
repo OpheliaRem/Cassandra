@@ -5,7 +5,7 @@
 
 #define HEAP_CAPACITY 1048576
 
-void initialize_heap(void);
+void init_heap(void);
 void* allocate(size_t capacity);
 void free(void* ptr);
 

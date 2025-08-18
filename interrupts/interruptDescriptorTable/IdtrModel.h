@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-typedef struct IdtrModel {
+typedef struct __attribute__((packed)) IdtrModel {
     uint16_t limit;
     uint32_t base;
 } IdtrModel;

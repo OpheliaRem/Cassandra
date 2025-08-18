@@ -1,11 +1,10 @@
-# Define the cross-compiler tool paths
-CROSS_BIN := $(HOME)/cross_compiler/install/bin
+CROSS_BIN := $(HOME)/opt/cross/bin
 CC := $(CROSS_BIN)/i686-elf-gcc
 AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o
 	$(CC) -T ./_build/linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
@@ -14,11 +13,19 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/string.o \
 		./_build/allocator.o \
 		./_build/convert.o \
+		./_build/gdt_init.o \
+		./_build/idt_initialization.o \
 	    ./_build/kernel.o \
 	    -lgcc
 
 kernel.o: kernel.c
 	$(CC) -c kernel.c -o ./_build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+idt_initialization.o: ./interrupts/interruptDescriptorTable/idt_initialization.c
+	$(CC) -c $< -o ./_build/idt_initialization.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+gdt_init.o: ./gdt/gdt_init.c
+	$(CC) -c $< -o ./_build/gdt_init.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 convert.o: ./innerStd/convert.c
 	$(CC) -c $< -o ./_build/convert.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra

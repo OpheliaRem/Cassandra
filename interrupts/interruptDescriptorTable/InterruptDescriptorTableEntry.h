@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-typedef struct InterruptDescriptorTableEntry {
+typedef struct __attribute__((packed)) InterruptDescriptorTableEntry {
     uint16_t interrupt_service_routine_address_low_bytes;
     uint16_t selector;
     uint8_t reserved; //zero
