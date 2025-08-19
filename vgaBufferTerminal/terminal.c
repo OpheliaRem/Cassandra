@@ -39,7 +39,23 @@ static void fill_whole_buffer_with(unsigned char c) {
 	}
 }
 
+static inline void outb(uint16_t port, uint8_t val) {
+	asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
+}
+
+static void set_cursor(size_t row, size_t col) {
+	uint16_t pos = row * VGA_WIDTH + col;
+
+	outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(pos & 0xFF));
+
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+
 void init_terminal(void) {
+	set_cursor(0, 0);
+
 	terminal_row = 0;
 	terminal_column = 0;
 	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
@@ -82,6 +98,8 @@ void terminal_newline(void) {
         terminal_row--;
 		terminal_scroll_down();
     }
+
+	set_cursor(terminal_row, terminal_column);
 }
 
 void terminal_putchar(char c) {
@@ -90,6 +108,8 @@ void terminal_putchar(char c) {
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_newline();
 	}
+
+	set_cursor(terminal_row, terminal_column);
 }
 
 static void previous_line() {
@@ -110,6 +130,8 @@ void terminal_backspace(void) {
 	}
 
 	put_entry_at(' ', terminal_color, --terminal_column, terminal_row);
+
+	set_cursor(terminal_row, terminal_column);
 }
 
 void terminal_clear(void) {
@@ -121,8 +143,9 @@ void terminal_clear(void) {
 	stack_void_ptr_foreach(&terminal_scroll_buffer, free);
 	stack_void_ptr_free(&terminal_scroll_buffer);
 	stack_void_ptr_init(&terminal_scroll_buffer);
-}
 
+	set_cursor(terminal_row, terminal_column);
+}
 
 static void write_n_chars(const char* data, size_t size) {
 	for (size_t i = 0; i < size && data[i]; i++) {
