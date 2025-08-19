@@ -18,11 +18,7 @@ void kernel_main(void) {
 
 	init_heap();
 	
-	terminal_initialize();
-
-	terminal_print_new_prompt();
-
-	asm volatile(".byte 0x0F, 0x0B");
+	init_terminal();
 
 	while(1);
 }

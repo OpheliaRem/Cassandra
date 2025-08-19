@@ -4,12 +4,13 @@ AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack_void_ptr.o
 	$(CC) -T ./_build/linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
 	    ./_build/exception_c.o \
 		./_build/terminal.o \
+		./_build/stack_void_ptr.o \
 		./_build/string.o \
 		./_build/allocator.o \
 		./_build/convert.o \
@@ -38,6 +39,9 @@ string.o: ./innerStd/string.c
 
 terminal.o: ./vgaBufferTerminal/terminal.c
 	$(CC) -c $< -o ./_build/terminal.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+stack_void_ptr.o: ./innerStd/StackVoidPtr.c
+	$(CC) -c $< -o ./_build/stack_void_ptr.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 exception_asm.o: ./interrupts/interruptServiceRoutines/exceptions/general_exception_handler.s
 	$(AS) $< -o ./_build/exception_asm.o

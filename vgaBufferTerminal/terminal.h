@@ -8,7 +8,6 @@
 #define VGA_HEIGHT  25
 #define VGA_MEMORY  0xB8000
 
-#define FIRST_COLUMN_FOR_TEXT 3
 #define PROMPT_SYMBOL '$'
 
 enum vga_color {
@@ -30,14 +29,17 @@ enum vga_color {
 	VGA_COLOR_WHITE = 15,
 };
 
-void terminal_initialize(void);
+void init_terminal(void);
 void terminal_set_color(uint8_t color);
 
 void terminal_newline(void);
-void terminal_putchar(char c);
 void terminal_backspace(void);
+void terminal_clear(void);
+void terminal_scroll_down(void);
+void terminal_putchar(char c);
 void terminal_write(const char* data);
 void terminal_writeln(const char* str);
+void terminal_write_int(int num);
 
 void terminal_print_new_prompt(void);
 
