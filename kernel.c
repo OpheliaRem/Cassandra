@@ -8,6 +8,8 @@
 #include "innerStd/allocator.h"
 #include "innerStd/convert.h"
 #include "innerStd/string.h"
+
+#include "commandHandling/command_handling.h"
  
 void kernel_main(void) {
 	asm volatile("cli");

@@ -49,3 +49,7 @@ void stack_void_ptr_foreach(StackVoidPtr* stack, void (*action)(void*)) {
         action(stack->data[i]);
     }
 }
+
+bool stack_void_ptr_is_empty(const StackVoidPtr* stack) {
+    return stack->size == 0;
+}

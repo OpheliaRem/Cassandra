@@ -4,13 +4,16 @@ AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack_void_ptr.o
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack_void_ptr.o commands.o command_handling.o parser.o
 	$(CC) -T ./_build/linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
 	    ./_build/exception_c.o \
 		./_build/terminal.o \
 		./_build/stack_void_ptr.o \
+		./_build/commands.o \
+		./_build/command_handling.o \
+		./_build/parser.o \
 		./_build/string.o \
 		./_build/allocator.o \
 		./_build/convert.o \
@@ -42,6 +45,15 @@ terminal.o: ./vgaBufferTerminal/terminal.c
 
 stack_void_ptr.o: ./innerStd/StackVoidPtr.c
 	$(CC) -c $< -o ./_build/stack_void_ptr.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+commands.o: ./commandHandling/commands.c
+	$(CC) -c $< -o ./_build/commands.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+command_handling.o: ./commandHandling/command_handling.c
+	$(CC) -c $< -o ./_build/command_handling.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+parser.o: ./innerStd/parser.c
+	$(CC) -c $< -o ./_build/parser.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 exception_asm.o: ./interrupts/interruptServiceRoutines/exceptions/general_exception_handler.s
 	$(AS) $< -o ./_build/exception_asm.o
