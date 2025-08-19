@@ -44,7 +44,7 @@ void stack_void_ptr_free(StackVoidPtr* stack) {
     free(stack->data);
 }
 
-void stack_void_ptr_foreach(StackVoidPtr *stack, void (*action)(void*)) {
+void stack_void_ptr_foreach(StackVoidPtr* stack, void (*action)(void*)) {
     for (size_t i = 0; i < stack->size; ++i) {
         action(stack->data[i]);
     }

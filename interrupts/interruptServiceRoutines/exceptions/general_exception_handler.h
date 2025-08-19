@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-typedef struct {
+typedef struct __attribute__((packed)) Registers {
     uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
 } Registers;
 

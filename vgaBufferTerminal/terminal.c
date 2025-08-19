@@ -157,6 +157,30 @@ void terminal_write_int(int num) {
 	}
 }
 
+void terminal_write_binary(int num) {
+	char* num_str = int_to_string_binary(num);
+	if (num_str) {
+		terminal_write(num_str);
+		free(num_str);
+	}
+}
+
+void terminal_write_oct(int num) {
+	char* num_str = int_to_string_oct(num);
+	if (num_str) {
+		terminal_write(num_str);
+		free(num_str);
+	}
+}
+
+void terminal_write_hex(int num) {
+	char* num_str = int_to_string_hex(num);
+	if (num_str) {
+		terminal_write(num_str);
+		free(num_str);
+	}
+}
+
 static void print_prompt(void) {
 	terminal_putchar(PROMPT_SYMBOL);
 	terminal_putchar(':');

@@ -40,6 +40,9 @@ void terminal_putchar(char c);
 void terminal_write(const char* data);
 void terminal_writeln(const char* str);
 void terminal_write_int(int num);
+void terminal_write_binary(int num);
+void terminal_write_oct(int num);
+void terminal_write_hex(int num);
 
 void terminal_print_new_prompt(void);
 
