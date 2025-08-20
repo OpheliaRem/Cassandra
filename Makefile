@@ -4,7 +4,7 @@ AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack_void_ptr.o commands.o command_handling.o parser.o
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack_void_ptr.o commands.o command_handling.o parser.o pic8259.o keyboard.o keyboard_isr_c.o
 	$(CC) -T ./_build/linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
@@ -19,6 +19,9 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/convert.o \
 		./_build/gdt_init.o \
 		./_build/idt_initialization.o \
+		./_build/pic8259.o \
+		./_build/keyboard.o \
+		./_build/keyboard_isr_c.o \
 	    ./_build/kernel.o \
 	    -lgcc
 
@@ -54,6 +57,15 @@ command_handling.o: ./commandHandling/command_handling.c
 
 parser.o: ./innerStd/parser.c
 	$(CC) -c $< -o ./_build/parser.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+pic8259.o: ./interrupts/programmableInterruptController/PIC8259.c
+	$(CC) -c $< -o ./_build/pic8259.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+keyboard.o: ./interrupts/devices/keyboard.c
+	$(CC) -c $< -o ./_build/keyboard.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+keyboard_isr_c.o: ./interrupts/interruptServiceRoutines/hardwareInterrupts/keyboard/keyboard_isr.c
+	$(CC) -c $< -o ./_build/keyboard_isr_c.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 exception_asm.o: ./interrupts/interruptServiceRoutines/exceptions/general_exception_handler.s
 	$(AS) $< -o ./_build/exception_asm.o

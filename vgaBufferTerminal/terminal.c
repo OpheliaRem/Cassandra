@@ -129,7 +129,7 @@ static void previous_line() {
 	terminal_column = VGA_WIDTH - 1;
 }
 
-void terminal_backspace(void) {
+static void backspace(void) {
 	if (terminal_column == 0) {
 		if (terminal_row == 0) {
 			return;
@@ -140,6 +140,18 @@ void terminal_backspace(void) {
 	put_entry_at(' ', terminal_color, --terminal_column, terminal_row);
 
 	set_cursor(terminal_row, terminal_column);
+}
+
+void terminal_backspace(void) {
+	const size_t index = terminal_row * VGA_WIDTH + terminal_column;
+
+	uint16_t* pos = &terminal_buffer[index];
+
+	if (vga_get_char(*(pos - PROMPT_LEN)) == PROMPT_SYMBOL) {
+		return;
+	}
+
+	backspace();
 }
 
 void terminal_clear(void) {
@@ -162,7 +174,7 @@ static void write_n_chars(const char* data, size_t size) {
 				terminal_newline();
 				break;
 			case '\b':
-				terminal_backspace();
+				backspace();
 				break;
 			default:
 				terminal_putchar(data[i]);
@@ -220,7 +232,7 @@ char* terminal_read() {
     while (pos != (uint16_t*)VGA_MEMORY && vga_get_char(*pos) != PROMPT_SYMBOL) {
         pos--;
     }
-	pos += 3;
+	pos += PROMPT_LEN;
 
     if (pos == (uint16_t*)VGA_MEMORY) {
         return NULL;

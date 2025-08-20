@@ -9,6 +9,7 @@
 #define VGA_MEMORY  0xB8000
 
 #define PROMPT_SYMBOL '$'
+#define PROMPT_LEN 3
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
