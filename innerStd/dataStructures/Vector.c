@@ -1,13 +1,13 @@
-#include "VectorVoidPtr.h"
+#include "Vector.h"
 #include "allocator.h"
 
-void vector_void_ptr_init(VectorVoidPtr* vector) {
+void vector_init(Vector* vector) {
     vector->size = 0;
     vector->capacity = 2;
     vector->data = (void**)allocate(vector->capacity * sizeof(void*));
 }
 
-static void resize(VectorVoidPtr* vector, size_t new_capacity) {
+static void resize(Vector* vector, size_t new_capacity) {
     void** new_data = (void**)allocate(new_capacity * sizeof(void*));
 
     for (size_t i = 0; i < vector->size; ++i) {
@@ -20,7 +20,7 @@ static void resize(VectorVoidPtr* vector, size_t new_capacity) {
     vector->capacity = new_capacity;
 }
 
-void vector_void_ptr_push(VectorVoidPtr* vector, void* data) {
+void vector_push(Vector* vector, void* data) {
     if (vector->size + 1 >= vector->capacity) {
         resize(vector, vector->capacity * 2);
     }
@@ -28,13 +28,13 @@ void vector_void_ptr_push(VectorVoidPtr* vector, void* data) {
     vector->data[vector->size++] = data;
 }
 
-void vector_void_ptr_pop(VectorVoidPtr* vector) {
+void vector_pop(Vector* vector) {
     if (vector->size-- < vector->capacity / 2) {
         resize(vector, vector->capacity / 2);
     }
 }
 
-void vector_void_ptr_free(VectorVoidPtr* vector) {
+void vector_free(Vector* vector) {
     vector->size = 0;
     vector->capacity = 0;
     free(vector->data);
