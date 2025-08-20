@@ -35,7 +35,9 @@ void terminal_set_color(uint8_t color);
 void terminal_newline(void);
 void terminal_backspace(void);
 void terminal_clear(void);
+
 void terminal_scroll_down(void);
+
 void terminal_putchar(char c);
 void terminal_write(const char* data);
 void terminal_writeln(const char* str);
@@ -43,6 +45,8 @@ void terminal_write_int(int num);
 void terminal_write_binary(int num);
 void terminal_write_oct(int num);
 void terminal_write_hex(int num);
+
+char* terminal_read(void);
 
 void terminal_print_new_prompt(void);
 

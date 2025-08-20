@@ -19,6 +19,14 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 	return (uint16_t) uc | (uint16_t) color << 8;
 }
 
+static inline char vga_get_char(uint16_t cell) {
+	return (char)(cell & 0xFF);
+}
+
+static inline uint8_t vga_get_color(uint16_t cell) {
+	return (uint8_t)(cell >> 8);
+}
+
 static void fill_row_with(size_t y, unsigned char c) {
 	if (y >= VGA_HEIGHT) {
 		return;
@@ -203,6 +211,36 @@ void terminal_write_hex(int num) {
 		free(num_str);
 	}
 }
+
+char* terminal_read() {
+    size_t current_index = terminal_row * VGA_WIDTH + terminal_column;
+    uint16_t* pos = &terminal_buffer[current_index];
+
+    uint16_t* end = pos;
+    while (pos != (uint16_t*)VGA_MEMORY && vga_get_char(*pos) != PROMPT_SYMBOL) {
+        pos--;
+    }
+	pos += 3;
+
+    if (pos == (uint16_t*)VGA_MEMORY) {
+        return NULL;
+    }
+
+    size_t len = end - pos + 1;
+
+    char* command = (char*)allocate((len + 1) * sizeof(char));
+    if (!command) {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < len; ++i) {
+        command[i] = vga_get_char(pos[i]);
+    }
+    command[len] = '\0';
+
+    return command;
+}
+
 
 static void print_prompt(void) {
 	terminal_putchar(PROMPT_SYMBOL);

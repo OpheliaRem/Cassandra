@@ -9,8 +9,6 @@
 #include "innerStd/convert.h"
 #include "innerStd/string.h"
 
-#include "commandHandling/command_handling.h"
- 
 void kernel_main(void) {
 	asm volatile("cli");
 
@@ -21,6 +19,8 @@ void kernel_main(void) {
 	init_heap();
 	
 	init_terminal();
+
+	terminal_print_new_prompt();
 
 	while(1);
 }

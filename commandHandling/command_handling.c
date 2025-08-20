@@ -14,6 +14,10 @@ static char* (*determine_command(const char* name))(const char*) {
         return command_clear;
     }
 
+    if (are_equal_strings("", name)) {
+        return command_newline;
+    }
+
     return command_mistake;
 }
 

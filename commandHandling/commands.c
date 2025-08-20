@@ -1,6 +1,7 @@
 #include "commands.h"
 #include "../innerStd/string.h"
 #include "../vgaBufferTerminal/terminal.h"
+#include "../innerStd/parser.h"
 
 char* command_mistake(const char* args) {
     (void)args;
@@ -19,6 +20,12 @@ char* command_echo(const char* args) {
 char* command_clear(const char* args) {
     (void)args;
     terminal_clear();
+    terminal_print_new_prompt();
+    return get_dynamic_string_from_char_seq("");
+}
+
+char* command_newline(const char* args) {
+    (void)args;
     terminal_print_new_prompt();
     return get_dynamic_string_from_char_seq("");
 }
