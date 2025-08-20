@@ -14,6 +14,7 @@ char* command_echo(const char* args) {
     }
     terminal_writeln("");
     terminal_writeln(args);
+    terminal_print_new_prompt();
     return get_dynamic_string_from_char_seq("");
 }
 
