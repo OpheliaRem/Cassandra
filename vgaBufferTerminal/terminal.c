@@ -124,9 +124,8 @@ static void previous_line() {
 	if (terminal_row == 0) {
 		return;
 	}
-
 	--terminal_row;
-	terminal_column = VGA_WIDTH - 1;
+	terminal_column = VGA_WIDTH;
 }
 
 static void backspace(void) {
