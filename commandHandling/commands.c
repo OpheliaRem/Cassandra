@@ -27,3 +27,8 @@ char* command_newline(const char* args) {
     (void)args;
     return get_dynamic_string_from_char_seq("");
 }
+
+char* command_help(const char* args) {
+    (void)args;
+    return get_dynamic_string_from_char_seq("\nNOT IMPLEMENTED YET");
+}

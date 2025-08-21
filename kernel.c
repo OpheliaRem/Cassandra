@@ -3,13 +3,9 @@
 #endif
 
 #include "gdt/gdt_init.h"
-#include "vgaBufferTerminal/terminal.h"
 #include "interrupts/interruptDescriptorTable/idt_initialization.h"
+#include "vgaBufferTerminal/terminal.h"
 #include "innerStd/allocator.h"
-#include "innerStd/convert.h"
-#include "innerStd/string.h"
-
-#include "interrupts/interruptServiceRoutines/hardwareInterrupts/programmableIntervalTimer/pit.h"
 
 void kernel_main(void) {
 	asm volatile("cli");

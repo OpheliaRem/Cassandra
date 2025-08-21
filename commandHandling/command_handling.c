@@ -18,6 +18,10 @@ static char* (*determine_command(const char* name))(const char*) {
         return command_newline;
     }
 
+    if (are_equal_strings("help", name)) {
+        return command_help;
+    }
+
     return command_mistake;
 }
 
