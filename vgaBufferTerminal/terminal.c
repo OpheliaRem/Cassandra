@@ -3,6 +3,7 @@
 #include "../innerStd/dataStructures/Stack.h"
 #include "../innerStd/allocator.h"
 #include "../innerStd/convert.h"
+#include "../commandHandling/command_handling.h"
 
 static size_t terminal_row;
 static size_t terminal_column;
@@ -264,4 +265,19 @@ void terminal_print_new_prompt(void) {
 		terminal_newline();
 	}
 	print_prompt();
+}
+
+void terminal_execute_command() {
+	char* command = terminal_read();
+
+	if (!command) {
+		terminal_writeln("Failed reading the command. Try again.");
+		return;
+	}
+
+	handle_command(command);
+
+	free(command);
+
+	terminal_print_new_prompt();
 }

@@ -51,4 +51,6 @@ char* terminal_read(void);
 
 void terminal_print_new_prompt(void);
 
+void terminal_execute_command();
+
 #endif

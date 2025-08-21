@@ -49,3 +49,22 @@ void pic_init(int offset1, int offset2, uint8_t mask1, uint8_t mask2) {
     outb(PIC1_DATA, mask1);
     outb(PIC2_DATA, mask2);
 }
+
+void pic_set_mask(uint8_t irq, bool masked) {
+    if (irq > 15) {
+        return; // allowed only  IRQ0–IRQ15
+    }
+
+    uint16_t port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
+    uint8_t bit   = (irq < 8) ? irq : irq - 8;
+
+    uint8_t mask = inb(port);
+
+    if (masked) {
+        mask |= (1 << bit);    // 1 = prohibit IRQ
+    } else {
+        mask &= ~(1 << bit);   // 0 = allow IRQ
+    }
+
+    outb(port, mask);
+}

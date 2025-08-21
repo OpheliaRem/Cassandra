@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "idt_initialization.h": "c",
+        "stdbool.h": "c"
+    }
+}

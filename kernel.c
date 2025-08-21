@@ -9,6 +9,8 @@
 #include "innerStd/convert.h"
 #include "innerStd/string.h"
 
+#include "interrupts/interruptServiceRoutines/hardwareInterrupts/programmableIntervalTimer/pit.h"
+
 void kernel_main(void) {
 	asm volatile("cli");
 

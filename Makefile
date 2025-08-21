@@ -4,7 +4,7 @@ AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o keyboard_isr_c.o linked_list.o
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o
 	$(CC) -T ./_build/linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
@@ -16,13 +16,15 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/parser.o \
 		./_build/string.o \
 		./_build/linked_list.o \
+		./_build/hash_map.o \
 		./_build/allocator.o \
 		./_build/convert.o \
+		./_build/interrupt_descriptor_table_entry.o \
 		./_build/gdt_init.o \
 		./_build/idt_initialization.o \
 		./_build/pic8259.o \
 		./_build/keyboard.o \
-		./_build/keyboard_isr_c.o \
+		./_build/pit.o \
 	    ./_build/kernel.o \
 	    -lgcc
 
@@ -47,6 +49,9 @@ string.o: ./innerStd/string.c
 linked_list.o: ./innerStd/dataStructures/LinkedList.c
 	$(CC) -c $< -o ./_build/linked_list.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
+hash_map.o: ./innerStd/dataStructures/HashMap.c
+	$(CC) -c $< -o ./_build/hash_map.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
 terminal.o: ./vgaBufferTerminal/terminal.c
 	$(CC) -c $< -o ./_build/terminal.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
@@ -65,11 +70,14 @@ parser.o: ./innerStd/parser.c
 pic8259.o: ./interrupts/programmableInterruptController/PIC8259.c
 	$(CC) -c $< -o ./_build/pic8259.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-keyboard.o: ./interrupts/devices/keyboard.c
+keyboard.o: ./interrupts/interruptServiceRoutines/hardwareInterrupts/keyboard/keyboard.c
 	$(CC) -c $< -o ./_build/keyboard.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-keyboard_isr_c.o: ./interrupts/interruptServiceRoutines/hardwareInterrupts/keyboard/keyboard_isr.c
-	$(CC) -c $< -o ./_build/keyboard_isr_c.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+pit.o: ./interrupts/interruptServiceRoutines/hardwareInterrupts/programmableIntervalTimer/pit.c
+	$(CC) -c $< -o ./_build/pit.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+interrupt_descriptor_table_entry.o: ./interrupts/interruptDescriptorTable/InterruptDescriptorTableEntry.c
+	$(CC) -c $< -o ./_build/interrupt_descriptor_table_entry.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra	
 
 exception_asm.o: ./interrupts/interruptServiceRoutines/exceptions/general_exception_handler.s
 	$(AS) $< -o ./_build/exception_asm.o

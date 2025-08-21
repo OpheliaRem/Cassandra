@@ -5,7 +5,7 @@
 
 char* command_mistake(const char* args) {
     (void)args;
-    return get_dynamic_string_from_char_seq("Unknown command");
+    return get_dynamic_string_from_char_seq("\nUnknown command");
 }
 
 char* command_echo(const char* args) {
@@ -14,19 +14,16 @@ char* command_echo(const char* args) {
     }
     terminal_writeln("");
     terminal_writeln(args);
-    terminal_print_new_prompt();
     return get_dynamic_string_from_char_seq("");
 }
 
 char* command_clear(const char* args) {
     (void)args;
     terminal_clear();
-    terminal_print_new_prompt();
     return get_dynamic_string_from_char_seq("");
 }
 
 char* command_newline(const char* args) {
     (void)args;
-    terminal_print_new_prompt();
     return get_dynamic_string_from_char_seq("");
 }

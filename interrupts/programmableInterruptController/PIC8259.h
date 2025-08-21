@@ -2,6 +2,7 @@
 #define PIC8259_FILE
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define PIC1            0x20
 #define PIC2            0xA0
@@ -26,7 +27,11 @@
 
 #define CASCADE_IRQ 2
 
+#define PIC1_OFFSET 32
+#define PIC2_OFFSET 40
+
 void pic_send_eoi(uint8_t irq);
 void pic_init(int offset1, int offset2, uint8_t mask1, uint8_t mask2);
+void pic_set_mask(uint8_t irq, bool masked);
 
 #endif

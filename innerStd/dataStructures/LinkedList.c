@@ -70,11 +70,26 @@ bool linked_list_is_empty(const LinkedList* list) {
 }
 
 void linked_list_foreach(const LinkedList* list, void(*action)(void*)) {
-    if (!list || !action) return;
+    if (!list || !action) {
+        return;
+    }
 
     const LinkedListNode* ptr = list->head;
     while (ptr) {
         action(ptr->data);
         ptr = ptr->next;
     }
+}
+
+LinkedListNode* linked_list_search(const LinkedList* list, void* to_find, bool(*are_equal)(void*, void*)) {
+    if (!list || !are_equal) {
+        return NULL;
+    }
+
+    LinkedListNode* ptr = list->head;
+    while (ptr && !are_equal(ptr->data, to_find)) {
+        ptr = ptr->next;
+    }
+
+    return ptr;
 }
