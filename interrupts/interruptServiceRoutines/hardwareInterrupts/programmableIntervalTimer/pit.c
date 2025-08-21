@@ -24,7 +24,7 @@ void __attribute__((naked)) pit_handler(void) {
 void pit_handler_c(void) {
     g_ticks++;
 
-    pic_send_eoi(PIT_INTERRUPT_VECTOR - PIC1_OFFSET);
+    pic_send_eoi(PIT_IRQ);
 }
 
 uint64_t pit_get_ticks(void) {
