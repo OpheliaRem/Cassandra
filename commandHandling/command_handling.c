@@ -9,8 +9,8 @@
 HashMap map_command_names_and_commands;
 HashMap map_command_names_and_descriptions;
 
-static char* (*determine_command(const char* name))(const char*) {
-    char*(*command)(const char*) = hash_map_get(&map_command_names_and_commands, name);
+static void(*determine_command(const char* name))(const char*) {
+    void(*command)(const char*) = hash_map_get(&map_command_names_and_commands, name);
 
     if (command) {
         return command;
@@ -27,7 +27,7 @@ void handle_command(const char* command) {
         return;
     }
 
-    char*(*action)(const char*) = determine_command(name);
+    void(*action)(const char*) = determine_command(name);
 
     free(name);
 
@@ -38,17 +38,13 @@ void handle_command(const char* command) {
         return;
     }
 
-    char* message = action(args);
-
-    free(args);
-
-    if (!message) {
-        return;
+    if (*args == ' ') {
+        ++args;
     }
 
-    terminal_write(message);
+    action(args);
 
-    free(message);
+    free(args);
 }
 
 static size_t hash(const void* ptr) {
@@ -74,7 +70,7 @@ void init_command_handling(void) {
     hash_map_add(&map_command_names_and_commands, "clear", command_clear);
     hash_map_add(&map_command_names_and_commands, "", command_newline);
     hash_map_add(&map_command_names_and_commands, "help", command_help);
-    //hash_map_add(&map_command_names_and_commands, "sleep", command_sleep);
+    hash_map_add(&map_command_names_and_commands, "sleep", command_sleep);
     hash_map_add(&map_command_names_and_commands, "measure-command-millis", command_measure_command_millis);
 
     //=====

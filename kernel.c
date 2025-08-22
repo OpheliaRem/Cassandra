@@ -4,6 +4,7 @@
 
 #include "gdt/gdt_init.h"
 #include "interrupts/interruptDescriptorTable/idt_initialization.h"
+#include "interrupts/interruptServiceRoutines/hardwareInterrupts/keyboard/keyboard.h"
 #include "commandHandling/command_handling.h"
 #include "vgaBufferTerminal/terminal.h"
 #include "innerStd/allocator.h"
@@ -23,5 +24,8 @@ void kernel_main(void) {
 
 	terminal_print_new_prompt();
 
-	while(1);
+	while(1) {
+		asm volatile("hlt");
+		keyboard_provide_command_input();
+	}
 }

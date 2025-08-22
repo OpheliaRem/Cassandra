@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+static volatile bool command_ready = false;
+
 // таблица для scancode set 1 (make codes)
 static const char scancode_table[128] = {
     0,   27, '1', '2', '3', '4', '5', '6',   // 0x00–0x07
@@ -43,7 +45,8 @@ static inline void determine_action(char c) {
     switch (c)
     {
     case '\n':
-      return terminal_execute_command();
+      command_ready = true;
+      return;
     case '\b':
       return terminal_backspace();
     default:
@@ -78,4 +81,14 @@ void keyboard_isr_c(void) {
 void keyboard_init(void) {
     idt_set_descriptor(KEYBOARD_INTERRUPT_VECTOR, keyboard_isr, 0x08, 0x8E);
     pic_set_mask(KEYBOARD_IRQ, false);
+}
+
+void keyboard_provide_command_input() {
+    if (!command_ready) {
+        return;
+    }
+
+    command_ready = false;
+
+    terminal_execute_command();
 }

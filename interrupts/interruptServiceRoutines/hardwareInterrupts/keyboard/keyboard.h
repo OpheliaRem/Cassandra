@@ -10,5 +10,6 @@
 #define KEYBOARD_STATUS_PORT 0x64
 
 void keyboard_init(void);
+void keyboard_provide_command_input();
 
 #endif
