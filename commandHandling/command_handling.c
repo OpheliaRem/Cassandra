@@ -74,6 +74,8 @@ void init_command_handling(void) {
     hash_map_add(&map_command_names_and_commands, "clear", command_clear);
     hash_map_add(&map_command_names_and_commands, "", command_newline);
     hash_map_add(&map_command_names_and_commands, "help", command_help);
+    //hash_map_add(&map_command_names_and_commands, "sleep", command_sleep);
+    hash_map_add(&map_command_names_and_commands, "measure-command-millis", command_measure_command_millis);
 
     //=====
 

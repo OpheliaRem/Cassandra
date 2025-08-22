@@ -78,3 +78,15 @@ void pit_sleep(uint64_t ms) {
         __asm__ __volatile__("hlt");
     }
 }
+
+uint64_t pit_measure_time(void(*work)(void)) {
+    const uint64_t ticks_before = g_ticks;
+
+    work();
+
+    const uint64_t ticks_after = g_ticks;
+
+    const uint64_t ticks = ticks_after - ticks_before;
+
+    return ticks * 1000 / g_freq;
+}
