@@ -41,3 +41,23 @@ char* get_dynamic_string_from_char_seq(const char* seq) {
 
     return result;
 }
+
+char* strcat_dynamic(const char* a, const char* b) {
+    size_t len_a = strlen(a);
+    size_t len_b = strlen(b);
+    size_t len = len_a + len_b;
+
+    char* result = (char*)allocate((len + 1) * sizeof(char));
+
+    for (size_t i = 0; i < len_a; ++i) {
+        result[i] = a[i];
+    }
+
+    for (size_t i = 0; i < len_b; ++i) {
+        result[len_a + i] = b[i];
+    }
+
+    result[len] = '\0';
+
+    return result;
+}
