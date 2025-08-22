@@ -210,7 +210,7 @@ void terminal_write_hex(int num) {
 
 char* terminal_read() {
     size_t current_index = terminal_row * VGA_WIDTH + terminal_column;
-    uint16_t* pos = &terminal_buffer[current_index];
+    uint16_t* pos = &terminal_buffer[--current_index];
 
     uint16_t* end = pos;
     while (pos != (uint16_t*)VGA_MEMORY && vga_get_char(*pos) != PROMPT_SYMBOL) {
