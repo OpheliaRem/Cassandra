@@ -10,8 +10,6 @@ static size_t terminal_column;
 static uint8_t terminal_color;
 static uint16_t* terminal_buffer = (uint16_t*)VGA_MEMORY;
 
-static Stack terminal_scroll_buffer;
-
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
 	return fg | bg << 4;
 }
@@ -70,8 +68,6 @@ void init_terminal(void) {
 	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	
 	fill_whole_buffer_with(' ');
-
-	stack_init(&terminal_scroll_buffer);
 }
 
 void terminal_set_color(uint8_t color) {
@@ -84,14 +80,6 @@ static void put_entry_at(char c, uint8_t color, size_t x, size_t y) {
 }
 
 void terminal_scroll_down() {
-	uint16_t* first_line = (uint16_t*)allocate(VGA_WIDTH * sizeof(uint16_t));
-	if (first_line) {
-		for (int i = 0; i < VGA_WIDTH; ++i) {
-			first_line[i] = terminal_buffer[i];
-		}
-		stack_push(&terminal_scroll_buffer, first_line);
-	}
-
 	for (int i = 0; i + 1 < VGA_HEIGHT; ++i) {
 		for (int j = 0; j < VGA_WIDTH; ++j) {
 			terminal_buffer[i * VGA_WIDTH + j] = terminal_buffer[(i + 1) * VGA_WIDTH + j];
@@ -159,10 +147,6 @@ void terminal_clear(void) {
 	terminal_column = 0;
 	
 	fill_whole_buffer_with(' ');
-
-	stack_foreach(&terminal_scroll_buffer, free);
-	stack_free(&terminal_scroll_buffer);
-	stack_init(&terminal_scroll_buffer);
 
 	set_cursor(terminal_row, terminal_column);
 }

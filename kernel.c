@@ -4,6 +4,7 @@
 
 #include "gdt/gdt_init.h"
 #include "interrupts/interruptDescriptorTable/idt_initialization.h"
+#include "commandHandling/command_handling.h"
 #include "vgaBufferTerminal/terminal.h"
 #include "innerStd/allocator.h"
 
@@ -17,6 +18,8 @@ void kernel_main(void) {
 	init_heap();
 	
 	init_terminal();
+
+	init_command_handling();
 
 	terminal_print_new_prompt();
 

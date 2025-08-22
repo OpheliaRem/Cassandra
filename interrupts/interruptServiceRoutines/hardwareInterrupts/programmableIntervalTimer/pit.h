@@ -19,6 +19,6 @@
 void pit_init(uint32_t desired_hz);
 uint64_t pit_get_ticks(void);
 uint32_t pit_get_frequency(void);
-void pit_sleep_ms(uint64_t ms);
+void pit_sleep(uint64_t ms);
 
 #endif

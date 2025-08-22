@@ -22,7 +22,7 @@ void init_idt() {
     pic_init(PIC1_OFFSET, PIC2_OFFSET, 0xFF, 0xFF);
 
     keyboard_init();
-    pit_init(1000);
+    pit_init(18);
 
     asm volatile("lidt %0" : : "m"(idtr));
     

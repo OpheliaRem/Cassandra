@@ -81,7 +81,7 @@ void linked_list_foreach(const LinkedList* list, void(*action)(void*)) {
     }
 }
 
-LinkedListNode* linked_list_search(const LinkedList* list, void* to_find, bool(*are_equal)(void*, void*)) {
+LinkedListNode* linked_list_search(const LinkedList* list, const void* to_find, bool(*are_equal)(const void*, const void*)) {
     if (!list || !are_equal) {
         return NULL;
     }

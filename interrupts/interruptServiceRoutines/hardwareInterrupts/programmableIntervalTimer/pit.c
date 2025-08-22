@@ -65,7 +65,7 @@ void pit_init(uint32_t desired_hz) {
     pic_set_mask(PIT_IRQ, false);
 }
 
-void pit_sleep_ms(uint64_t ms) {
+void pit_sleep(uint64_t ms) {
     if (g_freq == 0) {
         return;
     }
