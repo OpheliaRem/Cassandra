@@ -79,5 +79,7 @@ void init_command_handling(void) {
 
     hash_map_add(&map_command_names_and_descriptions, "echo", "format: <echo [text]>\nPrints to the VGA buffer the string following the command name skipping exactly one spacebar");
     hash_map_add(&map_command_names_and_descriptions, "clear", "format: <clear>\nClears the current terminal screen");
-    hash_map_add(&map_command_names_and_descriptions, "help", "format: <help>\nHelps you to find information about something, for example about a command, just like now!");
+    hash_map_add(&map_command_names_and_descriptions, "help", "format: <help [text]>\nHelps you to find information about something, for example about a command, just like now!");
+    hash_map_add(&map_command_names_and_descriptions, "sleep", "format: <sleep {milliseconds}>\nHalts the CPU for the amount of time provided in ms. The interrupts are still going to be handled.");
+    hash_map_add(&map_command_names_and_descriptions, "measure-command-millis", "format: <measure-command-millis {command}>\nExecutes the provided command and measures in ms the time it has taken");
 }
