@@ -4,8 +4,8 @@ AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o
-	$(CC) -T ./_build/linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o enter_user_mode.o syscalls.o isr80stub.o
+	$(CC) -T ./linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
 	    ./_build/exception_c.o \
@@ -25,6 +25,11 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/pic8259.o \
 		./_build/keyboard.o \
 		./_build/pit.o \
+		./_build/tss.o \
+		./_build/syscalls.o \
+		./_build/enter_user_mode.o \
+		./_build/isr80stub.o \
+		./hello_bin.o \
 	    ./_build/kernel.o \
 	    -lgcc
 
@@ -77,7 +82,19 @@ pit.o: ./interrupts/interruptServiceRoutines/hardwareInterrupts/programmableInte
 	$(CC) -c $< -o ./_build/pit.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 interrupt_descriptor_table_entry.o: ./interrupts/interruptDescriptorTable/InterruptDescriptorTableEntry.c
-	$(CC) -c $< -o ./_build/interrupt_descriptor_table_entry.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra	
+	$(CC) -c $< -o ./_build/interrupt_descriptor_table_entry.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+syscalls.o: ./userSpace/syscalls/syscalls.c
+	$(CC) -c $< -o ./_build/syscalls.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+enter_user_mode.o: ./userSpace/enter_user_mode.s
+	$(AS) $< -o ./_build/enter_user_mode.o
+
+isr80stub.o: ./interrupts/interruptServiceRoutines/softwareInterrupts/isr80stub.s
+	$(AS) $< -o ./_build/isr80stub.o
+
+tss.o: ./gdt/TaskStateSegment.c
+	$(CC) -c $< -o ./_build/tss.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 exception_asm.o: ./interrupts/interruptServiceRoutines/exceptions/general_exception_handler.s
 	$(AS) $< -o ./_build/exception_asm.o

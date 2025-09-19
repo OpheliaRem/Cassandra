@@ -1,6 +1,15 @@
 #include "gdt_init.h"
 #include "GdtrModel.h"
 #include "GdtEntry.h"
+#include "TaskStateSegment.h"
+
+#define KSTACK_SIZE 4096
+static uint8_t kernel_stack[KSTACK_SIZE] __attribute__((aligned(16)));
+
+#define GDT_LIMIT 0xFFFFF
+
+GlobalDescriptorTableEntry global_descriptor_table[6];
+GdtrModel gdtr;
 
 static void set_gdt_entry(GlobalDescriptorTableEntry* entry, uint32_t base, uint32_t limit, uint8_t access, uint8_t flags) {
     entry->limit_low    = (uint16_t)(limit & 0xFFFF);
@@ -11,10 +20,23 @@ static void set_gdt_entry(GlobalDescriptorTableEntry* entry, uint32_t base, uint
     entry->base_high    = (uint8_t)((base >> 24) & 0xFF);
 }
 
+static void set_tss_entry(int index, uint32_t base, uint32_t limit) {
+    set_gdt_entry(&global_descriptor_table[index], base, limit, 0x89, 0x00);
+}
+
 void init_gdt() {
-    set_gdt_entry(&global_descriptor_table[0], 0, 0, 0, 0); // NULL
-    set_gdt_entry(&global_descriptor_table[1], 0, 0xFFFFF, 0x9A, 0xC0); // Code
-    set_gdt_entry(&global_descriptor_table[2], 0, 0xFFFFF, 0x92, 0xC0); // Data
+    set_gdt_entry(&global_descriptor_table[NULL_SEGMENT], 0, 0, 0, 0); // NULL
+
+    //kernel_space
+    set_gdt_entry(&global_descriptor_table[KERNEL_CODE], 0, 0xFFFFF, 0x9A, 0xC0); // Code
+    set_gdt_entry(&global_descriptor_table[KERNEL_DATA], 0, 0xFFFFF, 0x92, 0xC0); // Data
+
+    //user_space
+    set_gdt_entry(&global_descriptor_table[USER_CODE], 0, GDT_LIMIT, 0xFA, 0xC0); //Code
+    set_gdt_entry(&global_descriptor_table[USER_DATA], 0, GDT_LIMIT, 0xF2, 0xC0); //Data
+
+    //tss
+    set_tss_entry(TSS_INDEX_IN_GDT, (uint32_t)&tss, sizeof(tss) - 1);
 
     gdtr.limit = sizeof(global_descriptor_table) - 1;
     gdtr.base  = (uint32_t)&global_descriptor_table;
@@ -34,5 +56,8 @@ void init_gdt() {
         :
         : "ax"
     );
+
+    void* top = kernel_stack + KSTACK_SIZE;
+    tss_init(top);
 }
 

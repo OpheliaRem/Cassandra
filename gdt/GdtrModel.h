@@ -8,6 +8,6 @@ typedef struct __attribute__((packed)) GdtrModel {
     uint32_t base; 
 } GdtrModel;
 
-static GdtrModel gdtr;
+extern GdtrModel gdtr;
 
 #endif

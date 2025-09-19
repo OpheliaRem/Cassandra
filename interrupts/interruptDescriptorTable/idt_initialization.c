@@ -8,6 +8,8 @@
 
 extern void* isr_stubs[];
 
+extern void isr80_stub(void);
+
 InterruptDescriptorTableEntry interrupt_descriptor_table[256];
 
 void init_idt() {
@@ -23,6 +25,11 @@ void init_idt() {
 
     keyboard_init();
     pit_init(18);
+
+    // selector = 0x08 (kernel code segment)
+    // flags = 0xEE = 1110 1110b
+    // P=1, DPL=3, Type=0xE
+    idt_set_descriptor(0x80, isr80_stub, 0x08, 0xEE);
 
     asm volatile("lidt %0" : : "m"(idtr));
     

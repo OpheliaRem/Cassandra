@@ -14,6 +14,6 @@ typedef struct __attribute__((packed)) GlobalDescriptorTableEntry {
     uint8_t  base_high; 
 } GlobalDescriptorTableEntry;
 
-static GlobalDescriptorTableEntry global_descriptor_table[3];
+extern GlobalDescriptorTableEntry global_descriptor_table[];
 
 #endif
