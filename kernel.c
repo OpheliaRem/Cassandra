@@ -9,8 +9,6 @@
 #include "vgaBufferTerminal/terminal.h"
 #include "innerStd/allocator.h"
 
-extern void enter_user_mode(uint32_t, uint32_t);
-
 void memcpy(uint8_t* dst, uint8_t* src, size_t size) {
 	for (size_t i = 0; i < size; ++i) {
 		dst[i] = src[i];
@@ -18,13 +16,14 @@ void memcpy(uint8_t* dst, uint8_t* src, size_t size) {
 }
 
 void kernel_main(void) {
+	init_heap();
+	
+	init_terminal();
+
 	init_gdt();
 
 	init_idt();
 
-	init_heap();
-	
-	init_terminal();
 
 	init_command_handling();
 
@@ -35,16 +34,18 @@ void kernel_main(void) {
 	extern uint8_t _binary_hello_bin_start[];
 	extern uint8_t _binary_hello_bin_end[];
 
-	#define USER_PROG_ADDR 0x00400000
-	#define USER_STACK_TOP 0x00402000  // стек чуть выше программы
+	size_t size = _binary_hello_bin_end - _binary_hello_bin_start + 1;
 
-	size_t size = _binary_hello_bin_end - _binary_hello_bin_start;
-	memcpy((uint8_t*)USER_PROG_ADDR, _binary_hello_bin_start, size);
+	uint8_t* program_address = (uint8_t*)allocate(size);
 
-	enter_user_mode(USER_PROG_ADDR, USER_STACK_TOP);
+	memcpy(program_address, _binary_hello_bin_start, size);
+
+	void(*user_process)(void) = (void(*)(void))program_address;
+	user_process();
+
+	free(program_address);
 
 	//EXPERIMENTAL_END
-
 
 	while(1) {
 		asm volatile("hlt");

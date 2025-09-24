@@ -4,7 +4,7 @@ AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o enter_user_mode.o syscalls.o isr80stub.o
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o syscalls.o isr80stub.o hello_bin.o
 	$(CC) -T ./linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
@@ -27,7 +27,6 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/pit.o \
 		./_build/tss.o \
 		./_build/syscalls.o \
-		./_build/enter_user_mode.o \
 		./_build/isr80stub.o \
 		./hello_bin.o \
 	    ./_build/kernel.o \
@@ -87,9 +86,6 @@ interrupt_descriptor_table_entry.o: ./interrupts/interruptDescriptorTable/Interr
 syscalls.o: ./userSpace/syscalls/syscalls.c
 	$(CC) -c $< -o ./_build/syscalls.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-enter_user_mode.o: ./userSpace/enter_user_mode.s
-	$(AS) $< -o ./_build/enter_user_mode.o
-
 isr80stub.o: ./interrupts/interruptServiceRoutines/softwareInterrupts/isr80stub.s
 	$(AS) $< -o ./_build/isr80stub.o
 
@@ -104,6 +100,15 @@ exception_c.o: ./interrupts/interruptServiceRoutines/exceptions/general_exceptio
 
 boot.o: boot.s
 	$(AS) boot.s -o ./_build/boot.o
+
+hello_bin.o: hello.bin
+	/usr/local/opt/binutils/bin/gobjcopy -I binary -O elf32-i386 hello.bin hello_bin.o
+
+hello.bin: hello.o
+	/usr/local/opt/binutils/bin/gobjcopy -O binary $< hello.bin
+
+hello.o: hello.asm
+	nasm -f elf32 $< -o hello.o
 
 clean:
 	rm -rf ./_build/*.o

@@ -6,11 +6,28 @@
 #include "../programmableInterruptController/PIC8259.h"
 #include <stdint.h>
 
+#include "../../vgaBufferTerminal/terminal.h"
+
 extern void* isr_stubs[];
 
 extern void isr80_stub(void);
 
 InterruptDescriptorTableEntry interrupt_descriptor_table[256];
+
+void dump_idt80(void) {
+    InterruptDescriptorTableEntry *e = &interrupt_descriptor_table[0x80];
+    uint32_t low  = e->interrupt_service_routine_address_low_bytes;
+    uint32_t high = e->interrupt_service_routine_address_high_bytes;
+    uint32_t off  = (high << 16) | low;
+    terminal_write("IDT[0x80]:\n");
+    terminal_write("  offset_low="); terminal_write_hex((uint16_t)low);
+    terminal_write("  selector=");    terminal_write_hex(e->selector);
+    terminal_write("  flags=");       terminal_write_hex(e->flags);
+    terminal_write("  offset_high="); terminal_write_hex((uint16_t)high);
+    terminal_write("\n  composed offset="); terminal_write_hex(off);
+    terminal_write("\n  &isr80_stub="); terminal_write_hex((uint32_t)isr80_stub);
+    terminal_write("\n");
+}
 
 void init_idt() {
     idtr.base = (uintptr_t)&interrupt_descriptor_table[0];
