@@ -109,14 +109,14 @@ exception_c.o: ./interrupts/interruptServiceRoutines/exceptions/general_exceptio
 boot.o: boot.s
 	$(AS) boot.s -o ./_build/boot.o
 
-hello_bin.o: hello.bin
-	/usr/local/opt/binutils/bin/gobjcopy -I binary -O elf32-i386 hello.bin hello_bin.o
+hello_bin.o: ./_build/hello.bin
+	/usr/local/opt/binutils/bin/gobjcopy -I binary -O elf32-i386 $< hello_bin.o
 
-hello.bin: hello.o
-	/usr/local/opt/binutils/bin/gobjcopy -O binary $< hello.bin
+hello.bin: ./_build/hello.o
+	/usr/local/opt/binutils/bin/gobjcopy -O binary $< ./_build/hello.bin
 
 hello.o: hello.asm
-	nasm -f elf32 $< -o hello.o
+	nasm -f elf32 $< -o ./_build/hello.o
 
 clean:
 	rm -rf ./_build/*.o
