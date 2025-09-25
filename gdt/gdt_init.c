@@ -22,10 +22,21 @@ void init_gdt() {
     set_gdt_entry(&global_descriptor_table[KERNEL_CODE], 0, 0xFFFFF, 0x9A, 0xC0); // Code
     set_gdt_entry(&global_descriptor_table[KERNEL_DATA], 0, 0xFFFFF, 0x92, 0xC0); // Data
 
+    //user_space
+    set_gdt_entry(&global_descriptor_table[USER_CODE], 0, 0xFFFFF, 0xFA, 0xC0);
+    set_gdt_entry(&global_descriptor_table[USER_DATA], 0, 0xFFFFF, 0xF2, 0xC0);
+
+    //TSS
+    uint32_t tss_base = (uint32_t)&tss;
+    uint32_t tss_limit = sizeof(TaskStateSegment) - 1;
+    set_gdt_entry(&global_descriptor_table[TSS_INDEX_IN_GDT], tss_base, tss_limit, 0x89, 0x40);
+
     gdtr.limit = sizeof(global_descriptor_table) - 1;
     gdtr.base  = (uint32_t)&global_descriptor_table;
 
     asm volatile("lgdt (%0)" : : "r" (&gdtr));
+
+    asm volatile("ltr %%ax" : : "a" (TSS_INDEX_IN_GDT * 8)); //Load TSS
 
     asm volatile (
         "ljmp $0x08, $.flush_cs\n\t"

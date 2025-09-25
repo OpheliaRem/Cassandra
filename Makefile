@@ -4,7 +4,7 @@ AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o syscalls.o isr80stub.o hello_bin.o
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o syscall.o process.o user_memory.o isr80stub.o hello_bin.o
 	$(CC) -T ./linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
@@ -26,7 +26,9 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/keyboard.o \
 		./_build/pit.o \
 		./_build/tss.o \
-		./_build/syscalls.o \
+		./_build/syscall.o \
+		./_build/process.o \
+		./_build/user_memory.o \
 		./_build/isr80stub.o \
 		./hello_bin.o \
 	    ./_build/kernel.o \
@@ -83,8 +85,14 @@ pit.o: ./interrupts/interruptServiceRoutines/hardwareInterrupts/programmableInte
 interrupt_descriptor_table_entry.o: ./interrupts/interruptDescriptorTable/InterruptDescriptorTableEntry.c
 	$(CC) -c $< -o ./_build/interrupt_descriptor_table_entry.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-syscalls.o: ./userSpace/syscalls/syscalls.c
-	$(CC) -c $< -o ./_build/syscalls.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+syscall.o: ./userSpace/syscall/syscall.c
+	$(CC) -c $< -o ./_build/syscall.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+process.o: ./userSpace/process.c
+	$(CC) -c $< -o ./_build/process.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+user_memory.o: ./userSpace/user_memory.c
+	$(CC) -c $< -o ./_build/user_memory.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 isr80stub.o: ./interrupts/interruptServiceRoutines/softwareInterrupts/isr80stub.s
 	$(AS) $< -o ./_build/isr80stub.o
