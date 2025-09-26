@@ -90,3 +90,33 @@ void command_measure_command_millis(const char* args) {
     terminal_writeln("");
     terminal_writeln(millis_str);
 }
+
+static inline void outb(uint8_t value, uint16_t port) {
+    asm volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
+}
+
+static inline uint8_t inb(uint16_t port) {
+    uint8_t ret;
+    asm volatile ("inb %1, %0" : "=a"(ret) : "Nd"(port));
+    return ret;
+}
+
+void command_reboot(const char* args) {
+    (void)args;
+
+    #define KEYBOARD_STATUS_PORT 0x64
+    #define KEYBOARD_CMD_PULSE   0xFE
+    #define KEYBOARD_STATUS_INPUT_FULL 0x02
+
+    uint8_t status;
+
+    asm volatile("cli");
+
+    do {
+        status = inb(KEYBOARD_STATUS_PORT);
+    } while (status & KEYBOARD_STATUS_INPUT_FULL);
+
+    outb(KEYBOARD_CMD_PULSE, KEYBOARD_STATUS_PORT);
+
+    asm volatile ("hlt");
+}

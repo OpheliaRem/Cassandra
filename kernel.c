@@ -23,25 +23,23 @@ void* allocate_user_memory(size_t size) {
 }
 
 void kernel_main(void) {
-	init_heap();
-	
-	init_terminal();
-
 	init_gdt();
 
 	init_idt();
 
+	void* kernel_stack_top = allocate(4096) + 4096;
+	
+	tss_init(kernel_stack_top);
+
+	init_heap();
+	
+	init_terminal();
 
 	init_command_handling();
 
 	terminal_print_new_prompt();
 
 	//EXPERIMENTAL
-
-	void* kernel_stack_top = allocate(4096) + 4096;
-	
-	tss_init(kernel_stack_top);
-
 	extern uint8_t _binary_hello_bin_start[];
     extern uint8_t _binary_hello_bin_end[];
     
@@ -53,7 +51,6 @@ void kernel_main(void) {
     uint8_t* user_stack = (uint8_t*)allocate_user_memory(4096) + 4096;
     
     switch_to_user_mode(user_code, user_stack);
-
 	//EXPERIMENTAL_END
 
 	while(1) {
