@@ -2,6 +2,7 @@
 #include "commands.h"
 #include "../innerStd/allocator.h"
 #include "../innerStd/string.h"
+#include "../innerStd/dataStructures/Vector.h"
 #include "../innerStd/parser.h"
 #include "../vgaBufferTerminal/terminal.h"
 #include <stdbool.h>
@@ -60,7 +61,7 @@ static size_t hash(const void* ptr) {
 }
 
 static bool are_equal(const void* a, const void* b) {
-    return are_equal_strings((char*)a, (char*)b);
+    return string_compare((char*)a, (char*)b);
 }
 
 void init_command_handling(void) {

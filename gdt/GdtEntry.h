@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include <stdint.h>
-
 typedef struct __attribute__((packed)) GlobalDescriptorTableEntry {
     uint16_t limit_low;
     uint16_t base_low;

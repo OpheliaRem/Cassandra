@@ -60,6 +60,35 @@ static void set_cursor(size_t row, size_t col) {
     outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
 }
 
+static void previous_line() {
+	if (terminal_row == 0) {
+		return;
+	}
+	--terminal_row;
+	terminal_column = VGA_WIDTH;
+}
+
+static void set_index_back(void) {
+	if (terminal_column == 0) {
+		if (terminal_row == 0) {
+			return;
+		}
+		previous_line();
+	}
+
+	--terminal_column;
+
+	set_cursor(terminal_row, terminal_column);
+}
+
+static void set_index_forward(void) {
+	if (++terminal_column == VGA_WIDTH) {
+		terminal_newline();
+	}
+
+	set_cursor(terminal_row, terminal_column);
+}
+
 void init_terminal(void) {
 	set_cursor(0, 0);
 
@@ -99,35 +128,35 @@ void terminal_newline(void) {
 	set_cursor(terminal_row, terminal_column);
 }
 
-void terminal_putchar(char c) {
+static void put_entry_and_move_index_forward(char c) {
 	put_entry_at(c, terminal_color, terminal_column, terminal_row);
-
-	if (++terminal_column == VGA_WIDTH) {
-		terminal_newline();
-	}
-
-	set_cursor(terminal_row, terminal_column);
+	set_index_forward();
 }
 
-static void previous_line() {
-	if (terminal_row == 0) {
-		return;
+static void determine_action_with_char(char c) {
+	switch(c) {
+		case '\n': 	return terminal_newline();
+		case '\b':	return terminal_backspace();
+		default:	return put_entry_and_move_index_forward(c);
 	}
-	--terminal_row;
-	terminal_column = VGA_WIDTH;
+}
+
+void terminal_putchar(char c) {
+	determine_action_with_char(c);
+}
+
+int terminal_getchar() {
+	char character = vga_get_char(terminal_buffer[terminal_row * VGA_WIDTH + terminal_column]);
+
+	set_index_forward();
+
+	return (int)character;
 }
 
 static void backspace(void) {
-	if (terminal_column == 0) {
-		if (terminal_row == 0) {
-			return;
-		}
-		previous_line();
-	}
+	set_index_back();
 
-	put_entry_at(' ', terminal_color, --terminal_column, terminal_row);
-
-	set_cursor(terminal_row, terminal_column);
+	put_entry_at(' ', terminal_color, terminal_column, terminal_row);
 }
 
 void terminal_backspace(void) {
@@ -151,24 +180,14 @@ void terminal_clear(void) {
 	set_cursor(terminal_row, terminal_column);
 }
 
-static void write_n_chars(const char* data, size_t size) {
-	for (size_t i = 0; i < size && data[i]; i++) {
-		switch (data[i]) {
-			case '\n':
-				terminal_newline();
-				break;
-			case '\b':
-				backspace();
-				break;
-			default:
-				terminal_putchar(data[i]);
-				break;
-		}
+static void write_n_chars(const char* data, size_t n) {
+	for (size_t i = 0; i < n && data[i]; i++) {
+		terminal_putchar(data[i]);
 	}
 }
 
 void terminal_write(const char* data) {
-	write_n_chars(data, strlen(data));
+	write_n_chars(data, string_get_len(data));
 }
 
 void terminal_writeln(const char* str) {
@@ -210,17 +229,29 @@ void terminal_write_hex(int num) {
 
 char* terminal_read() {
     size_t current_index = terminal_row * VGA_WIDTH + terminal_column;
-    uint16_t* pos = &terminal_buffer[--current_index];
+    //uint16_t* pos = &terminal_buffer[--current_index];
+    uint16_t* end = &terminal_buffer[--current_index];
 
-    uint16_t* end = pos;
-    while (pos != (uint16_t*)VGA_MEMORY && vga_get_char(*pos) != PROMPT_SYMBOL) {
+    /* while (pos != (uint16_t*)VGA_MEMORY && vga_get_char(*pos) != PROMPT_SYMBOL) {
         pos--;
     }
 	pos += PROMPT_LEN;
 
     if (pos == (uint16_t*)VGA_MEMORY) {
         return NULL;
-    }
+    } */
+
+	while (
+		&terminal_buffer[terminal_row * VGA_WIDTH + terminal_column] != (uint16_t*)VGA_MEMORY && 
+		vga_get_char(terminal_buffer[terminal_row * VGA_WIDTH + terminal_column]) != PROMPT_SYMBOL
+	) {
+		set_index_back();
+	}
+
+	for (int i = 0; i < PROMPT_LEN; ++i) {
+		set_index_forward();
+	}
+	uint16_t* pos = &terminal_buffer[terminal_row * VGA_WIDTH + terminal_column];
 
     size_t len = end - pos + 1;
 
@@ -230,7 +261,8 @@ char* terminal_read() {
     }
 
     for (size_t i = 0; i < len; ++i) {
-        command[i] = vga_get_char(pos[i]);
+        //command[i] = vga_get_char(pos[i]);
+		command[i] = terminal_getchar();
     }
     command[len] = '\0';
 

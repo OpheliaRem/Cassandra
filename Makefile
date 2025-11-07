@@ -4,7 +4,10 @@ AS := $(CROSS_BIN)/i686-elf-as
 
 all: cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o syscall.o process.o user_memory.o isr80stub.o hello_bin.o
+run: cassandra
+	qemu-system-i386 -kernel cassandra
+
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o syscall.o process.o user_memory.o isr80stub.o hello_bin.o vector.o io.o
 	$(CC) -T ./linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
@@ -17,7 +20,9 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/string.o \
 		./_build/linked_list.o \
 		./_build/hash_map.o \
+		./_build/vector.o \
 		./_build/allocator.o \
+		./_build/io.o \
 		./_build/convert.o \
 		./_build/interrupt_descriptor_table_entry.o \
 		./_build/gdt_init.o \
@@ -55,6 +60,9 @@ string.o: ./innerStd/string.c
 linked_list.o: ./innerStd/dataStructures/LinkedList.c
 	$(CC) -c $< -o ./_build/linked_list.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
+vector.o: ./innerStd/dataStructures/Vector.c
+	$(CC) -c $< -o ./_build/vector.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
 hash_map.o: ./innerStd/dataStructures/HashMap.c
 	$(CC) -c $< -o ./_build/hash_map.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
@@ -63,6 +71,9 @@ terminal.o: ./vgaBufferTerminal/terminal.c
 
 stack.o: ./innerStd/dataStructures/Stack.c
 	$(CC) -c $< -o ./_build/stack.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+io.o: ./innerStd/io.c
+	$(CC) -c $< -o ./_build/io.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 commands.o: ./commandHandling/commands.c
 	$(CC) -c $< -o ./_build/commands.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra

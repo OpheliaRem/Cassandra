@@ -3,7 +3,7 @@
 #include "allocator.h"
 
 char* parse(const char* str, size_t pos, char symbol, size_t* slice_len) {
-    size_t len = strlen(str);
+    size_t len = string_get_len(str);
 
     if (pos > len) {
         return NULL;

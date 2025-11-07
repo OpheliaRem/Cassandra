@@ -40,6 +40,8 @@ void terminal_clear(void);
 void terminal_scroll_down(void);
 
 void terminal_putchar(char c);
+int terminal_getchar();
+
 void terminal_write(const char* data);
 void terminal_writeln(const char* str);
 void terminal_write_int(int num);

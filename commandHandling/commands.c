@@ -1,6 +1,7 @@
 #include "commands.h"
 #include "../innerStd/string.h"
 #include "../vgaBufferTerminal/terminal.h"
+#include "../innerStd/io.h"
 #include "../innerStd/parser.h"
 #include "../innerStd/allocator.h"
 #include "../innerStd/convert.h"
@@ -22,12 +23,11 @@ static void command_wrapper(void) {
 
 void command_mistake(const char* args) {
     (void)args;
-    terminal_write("\nUnknown command\n");
+    print("\nUnknown command\n");
 }
 
 void command_echo(const char* args) {
-    terminal_writeln("");
-    terminal_writeln(args);
+    printf("\n%s\n", args);
 }
 
 void command_clear(const char* args) {
@@ -43,13 +43,11 @@ void command_help(const char* args) {
     const char* description = hash_map_get(&map_command_names_and_descriptions, args);
 
     if (!description) {
-        terminal_write("\nNo such command found: ");
-        terminal_writeln(args);
+        printf("\nNo such command found: %s", args);
         return;
     }
 
-    terminal_writeln("");
-    terminal_writeln(description);
+    printf("\n%s\n", description);
 }
 
 void command_sleep(const char* args) {
@@ -65,8 +63,7 @@ void command_measure_command_millis(const char* args) {
     current_ctx.func = hash_map_get(&map_command_names_and_commands, command_to_measure_name);
 
     if (!current_ctx.func) {
-        terminal_write("\nNo function found: ");
-        terminal_writeln(command_to_measure_name);
+        printf("\nNo function found: %s\n", command_to_measure_name);
         free(command_to_measure_args);
         free(command_to_measure_name);
         return;
@@ -80,15 +77,7 @@ void command_measure_command_millis(const char* args) {
 
     free(command_to_measure_args);
 
-    char* millis_str = int_to_string(millis);
-
-    if (!millis_str) {
-        terminal_writeln("\nInternal error occured. Please try again");
-        return;
-    }
-
-    terminal_writeln("");
-    terminal_writeln(millis_str);
+    printf("\n%d\n", millis);
 }
 
 static inline void outb(uint8_t value, uint16_t port) {

@@ -10,6 +10,7 @@
 #include "commandHandling/command_handling.h"
 #include "vgaBufferTerminal/terminal.h"
 #include "innerStd/allocator.h"
+#include "innerStd/io.h"
 
 void memcpy(uint8_t* dst, uint8_t* src, size_t size) {
 	for (size_t i = 0; i < size; ++i) {
@@ -35,11 +36,13 @@ void kernel_main(void) {
 	
 	init_terminal();
 
+	init_io_dispatcher(VGA_BUFFER_IN, VGA_BUFFER_OUT);
+
 	init_command_handling();
 
 	terminal_print_new_prompt();
 
-	//EXPERIMENTAL
+	/* //EXPERIMENTAL
 	extern uint8_t _binary_hello_bin_start[];
     extern uint8_t _binary_hello_bin_end[];
     
@@ -51,7 +54,7 @@ void kernel_main(void) {
     uint8_t* user_stack = (uint8_t*)allocate_user_memory(4096) + 4096;
     
     switch_to_user_mode(user_code, user_stack);
-	//EXPERIMENTAL_END
+	//EXPERIMENTAL_END */
 
 	while(1) {
 		asm volatile("hlt");
