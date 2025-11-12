@@ -55,7 +55,7 @@ void* allocate(size_t size) {
     return NULL;
 }
 
-void free(void* ptr) {
+void deallocate(void* ptr) {
     if (!ptr) {
         return;
     }

@@ -1,14 +1,11 @@
 #include "commands.h"
-#include "../innerStd/string.h"
 #include "../vgaBufferTerminal/terminal.h"
-#include "../innerStd/io.h"
-#include "../innerStd/parser.h"
-#include "../innerStd/allocator.h"
-#include "../innerStd/convert.h"
 #include "command_handling.h"
 #include "../interrupts/interruptServiceRoutines/hardwareInterrupts/programmableIntervalTimer/pit.h"
+#include "../include_path.h"
+#include STD
 
-struct CommandContext {
+/* struct CommandContext {
     char* (*func)(const char* args);
     const char* args;
     char* result;
@@ -19,65 +16,64 @@ static struct CommandContext current_ctx;
 static void command_wrapper(void) {
     current_ctx.result = current_ctx.func(current_ctx.args);
     free(current_ctx.result);
+} */
+
+DEFINE_COMMAND(command_mistake) {
+    printf("\nUnknown command: %s\n", vector_immutable_get(&args, 0));
 }
 
-void command_mistake(const char* args) {
-    (void)args;
-    print("\nUnknown command\n");
+DEFINE_COMMAND(command_echo) {
+    println("");
+    for (size_t i = 1; i < args.size; ++i) {
+        printf("%s", vector_immutable_get(&args, i));
+        if (i != args.size - 1) {
+            print(" ");
+        }
+    }
+    println("");
 }
 
-void command_echo(const char* args) {
-    printf("\n%s\n", args);
-}
-
-void command_clear(const char* args) {
+DEFINE_COMMAND(command_clear) {
     (void)args;
     terminal_clear();
 }
 
-void command_newline(const char* args) {
+DEFINE_COMMAND(command_newline) {
     (void)args;
 }
 
-void command_help(const char* args) {
-    const char* description = hash_map_get(&map_command_names_and_descriptions, args);
+DEFINE_COMMAND(command_help) {
+    const char* command_name = vector_immutable_get(&args, 1);
+
+    if (!command_name) {
+        printf("\nhelp: couldn't find a command name\n");
+        return;
+    }
+
+    const char* description = hash_map_get(&map_command_names_and_descriptions, command_name);
 
     if (!description) {
-        printf("\nNo such command found: %s", args);
+        printf("\nhelp: No such command found: %s", command_name);
         return;
     }
 
     printf("\n%s\n", description);
 }
 
-void command_sleep(const char* args) {
-    pit_sleep(string_to_int(args));
-}
+DEFINE_COMMAND(command_sleep) {
+    const char* num = vector_immutable_get(&args, 1);
 
-void command_measure_command_millis(const char* args) {
-    size_t name_len;
-    size_t command_args_len;
-    char* command_to_measure_name = parse(args, 0, ' ', &name_len);
-    char* command_to_measure_args = parse(args, name_len, '\0', &command_args_len);
-
-    current_ctx.func = hash_map_get(&map_command_names_and_commands, command_to_measure_name);
-
-    if (!current_ctx.func) {
-        printf("\nNo function found: %s\n", command_to_measure_name);
-        free(command_to_measure_args);
-        free(command_to_measure_name);
+    if (!num) {
+        printf("\nsleep: couldn't get a number to use\n");
         return;
     }
 
-    free(command_to_measure_name);
+    pit_sleep(atoi(num));
+}
 
-    current_ctx.args = command_to_measure_args;
-
-    uint64_t millis = pit_measure_time(command_wrapper);
-
-    free(command_to_measure_args);
-
-    printf("\n%d\n", millis);
+DEFINE_COMMAND(command_measure_command_millis) {
+    (void)args;
+    printf("\nSorry, this command was defined in the standard, but it is still in progress\n");
 }
 
 static inline void outb(uint8_t value, uint16_t port) {
@@ -90,7 +86,7 @@ static inline uint8_t inb(uint16_t port) {
     return ret;
 }
 
-void command_reboot(const char* args) {
+DEFINE_COMMAND(command_reboot) {
     (void)args;
 
     #define KEYBOARD_STATUS_PORT 0x64

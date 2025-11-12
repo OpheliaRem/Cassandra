@@ -84,7 +84,7 @@ static inline void put_formatted_int(int a, enum Base base) {
     }
 
     print(num_str);
-    free(num_str);
+    deallocate(num_str);
 }
 
 static inline void put_formatted_element(va_list* factor, char c) {
@@ -112,4 +112,10 @@ void printf(const char* format, ...) {
         putchar(format[i]);
     }
     va_end(factor);
+}
+
+void scan(char* buf, size_t n) {
+    for (size_t i = 0; i < n; ++i) {
+        buf[i] = (char)getchar();
+    }
 }

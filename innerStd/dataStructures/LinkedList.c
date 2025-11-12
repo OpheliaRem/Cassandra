@@ -41,7 +41,7 @@ void linked_list_pop_back(LinkedList* list) {
     }
 
     if (list->head == list->tail) {
-        free(list->head);
+        deallocate(list->head);
         list->head = NULL;
         list->tail = NULL;
         list->size = 0;
@@ -53,7 +53,7 @@ void linked_list_pop_back(LinkedList* list) {
         ptr = ptr->next;
     }
     
-    free(list->tail);
+    deallocate(list->tail);
     list->tail = ptr;
     ptr->next = NULL;
     list->size--;

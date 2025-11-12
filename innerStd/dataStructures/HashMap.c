@@ -53,7 +53,7 @@ static void resize(HashMap* map, size_t new_capacity) {
         linked_list_clear(&map->lists_with_nodes[i]);
     }
 
-    free(map->lists_with_nodes);
+    deallocate(map->lists_with_nodes);
 
     map->array_capacity = new_capacity;
     map->lists_with_nodes = new_lists;
@@ -79,7 +79,7 @@ void hash_map_add(HashMap* map, void* key, void* val) {
     LinkedListNode* node_with_given_key = linked_list_search(&map->lists_with_nodes[index], key, find_existing_key);
     
     if (node_with_given_key) {
-        free(node_with_given_key->data);
+        deallocate(node_with_given_key->data);
         node_with_given_key->data = new_node;
     } else {
         linked_list_push_back(&map->lists_with_nodes[index], new_node);
@@ -113,11 +113,11 @@ void* hash_map_get(const HashMap* map, const void* key) {
 void hash_map_clear(HashMap* map) {
     if (map->lists_with_nodes) {
         for (size_t i = 0; i < map->array_capacity; ++i) {
-            linked_list_foreach(&map->lists_with_nodes[i], free);
+            linked_list_foreach(&map->lists_with_nodes[i], deallocate);
             linked_list_clear(&map->lists_with_nodes[i]);
         }
     
-        free(map->lists_with_nodes);
+        deallocate(map->lists_with_nodes);
     }
 
     map->lists_with_nodes = NULL;

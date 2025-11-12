@@ -1,17 +1,14 @@
+#include <stdbool.h>
 #include "command_handling.h"
 #include "commands.h"
-#include "../innerStd/allocator.h"
-#include "../innerStd/string.h"
-#include "../innerStd/dataStructures/Vector.h"
-#include "../innerStd/parser.h"
-#include "../vgaBufferTerminal/terminal.h"
-#include <stdbool.h>
+#include "../include_path.h"
+#include STD
 
 HashMap map_command_names_and_commands;
 HashMap map_command_names_and_descriptions;
 
-static void(*determine_command(const char* name))(const char*) {
-    void(*command)(const char*) = hash_map_get(&map_command_names_and_commands, name);
+static CommandType determine_command(const char* name) {
+    CommandType command = hash_map_get(&map_command_names_and_commands, name);
 
     if (command) {
         return command;
@@ -20,32 +17,23 @@ static void(*determine_command(const char* name))(const char*) {
     return command_mistake;
 }
 
-void handle_command(const char* command) {
-    size_t name_len = 0;
-    char* name = parse(command, 0, ' ', &name_len);
+void handle_command(const char* input) {
+    char* command = string_copy(input);
+    string_mutate_trim(&command, ' ');
+    Vector args = string_split(command, ' ');
+    free(command);
 
+    const char* name = vector_immutable_get(&args, 0);
     if (!name) {
         return;
     }
 
-    void(*action)(const char*) = determine_command(name);
-
-    free(name);
-
-    size_t args_len = 0;
-    char* args = parse(command, name_len, '\0', &args_len);
-
-    if (!args) {
-        return;
-    }
-
-    if (*args == ' ') {
-        ++args;
-    }
+    CommandType action = determine_command(name);
 
     action(args);
 
-    free(args);
+    vector_foreach(&args, free);
+    vector_free(&args);
 }
 
 static size_t hash(const void* ptr) {
@@ -61,7 +49,7 @@ static size_t hash(const void* ptr) {
 }
 
 static bool are_equal(const void* a, const void* b) {
-    return string_compare((char*)a, (char*)b);
+    return string_compare((const char*)a, (const char*)b);
 }
 
 void init_command_handling(void) {

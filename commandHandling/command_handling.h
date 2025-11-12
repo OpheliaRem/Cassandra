@@ -1,7 +1,8 @@
 #ifndef COMMAND_HANDLING
 #define COMMAND_HANDLING
 
-#include "../innerStd/dataStructures/HashMap.h"
+#include "../include_path.h"
+#include STD
 
 extern HashMap map_command_names_and_commands;
 extern HashMap map_command_names_and_descriptions;

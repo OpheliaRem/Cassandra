@@ -10,7 +10,9 @@
 #include "commandHandling/command_handling.h"
 #include "vgaBufferTerminal/terminal.h"
 #include "innerStd/allocator.h"
-#include "innerStd/io.h"
+
+#include "include_path.h"
+#include STD
 
 void memcpy(uint8_t* dst, uint8_t* src, size_t size) {
 	for (size_t i = 0; i < size; ++i) {

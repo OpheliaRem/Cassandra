@@ -14,7 +14,7 @@ static void resize(Stack* stack, size_t new_capacity) {
         new_data[i] = stack->data[i];
     }
 
-    free(stack->data);
+    deallocate(stack->data);
 
     stack->data = new_data;
     stack->capacity = new_capacity;
@@ -41,7 +41,7 @@ void* stack_top(const Stack* stack) {
 void stack_free(Stack* stack) {
     stack->size = 0;
     stack->capacity = 0;
-    free(stack->data);
+    deallocate(stack->data);
 }
 
 void stack_foreach(Stack* stack, void (*action)(void*)) {

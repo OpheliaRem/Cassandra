@@ -7,6 +7,6 @@
 
 void init_heap(void);
 void* allocate(size_t capacity);
-void free(void* ptr);
+void deallocate(void* ptr);
 
 #endif

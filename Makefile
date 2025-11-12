@@ -7,7 +7,7 @@ all: cassandra
 run: cassandra
 	qemu-system-i386 -kernel cassandra
 
-cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o parser.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o syscall.o process.o user_memory.o isr80stub.o hello_bin.o vector.o io.o
+cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o allocator.o convert.o idt_initialization.o gdt_init.o stack.o commands.o command_handling.o pic8259.o keyboard.o linked_list.o hash_map.o interrupt_descriptor_table_entry.o pit.o tss.o syscall.o process.o user_memory.o isr80stub.o hello_bin.o vector.o io.o std.o
 	$(CC) -T ./linker.ld -o cassandra -ffreestanding -O2 -nostdlib \
 	    ./_build/boot.o \
 	    ./_build/exception_asm.o \
@@ -16,7 +16,6 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/stack.o \
 		./_build/commands.o \
 		./_build/command_handling.o \
-		./_build/parser.o \
 		./_build/string.o \
 		./_build/linked_list.o \
 		./_build/hash_map.o \
@@ -35,12 +34,16 @@ cassandra: kernel.o boot.o exception_asm.o exception_c.o terminal.o string.o all
 		./_build/process.o \
 		./_build/user_memory.o \
 		./_build/isr80stub.o \
+		./_build/std.o \
 		./hello_bin.o \
 	    ./_build/kernel.o \
 	    -lgcc
 
 kernel.o: kernel.c
 	$(CC) -c kernel.c -o ./_build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+std.o: std.c
+	$(CC) -c $< -o ./_build/std.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 idt_initialization.o: ./interrupts/interruptDescriptorTable/idt_initialization.c
 	$(CC) -c $< -o ./_build/idt_initialization.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
@@ -80,9 +83,6 @@ commands.o: ./commandHandling/commands.c
 
 command_handling.o: ./commandHandling/command_handling.c
 	$(CC) -c $< -o ./_build/command_handling.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-
-parser.o: ./innerStd/parser.c
-	$(CC) -c $< -o ./_build/parser.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 pic8259.o: ./interrupts/programmableInterruptController/PIC8259.c
 	$(CC) -c $< -o ./_build/pic8259.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra

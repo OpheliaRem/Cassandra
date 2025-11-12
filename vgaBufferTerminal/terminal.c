@@ -187,7 +187,7 @@ static void write_n_chars(const char* data, size_t n) {
 }
 
 void terminal_write(const char* data) {
-	write_n_chars(data, string_get_len(data));
+	write_n_chars(data, string_len(data));
 }
 
 void terminal_writeln(const char* str) {
@@ -199,7 +199,7 @@ void terminal_write_int(int num) {
 	char* num_str = int_to_string(num);
 	if (num_str) {
 		terminal_write(num_str);
-		free(num_str);
+		deallocate(num_str);
 	}
 }
 
@@ -207,7 +207,7 @@ void terminal_write_binary(int num) {
 	char* num_str = int_to_string_binary(num);
 	if (num_str) {
 		terminal_write(num_str);
-		free(num_str);
+		deallocate(num_str);
 	}
 }
 
@@ -215,7 +215,7 @@ void terminal_write_oct(int num) {
 	char* num_str = int_to_string_oct(num);
 	if (num_str) {
 		terminal_write(num_str);
-		free(num_str);
+		deallocate(num_str);
 	}
 }
 
@@ -223,7 +223,7 @@ void terminal_write_hex(int num) {
 	char* num_str = int_to_string_hex(num);
 	if (num_str) {
 		terminal_write(num_str);
-		free(num_str);
+		deallocate(num_str);
 	}
 }
 
@@ -293,7 +293,7 @@ void terminal_execute_command() {
 
 	handle_command(command);
 
-	free(command);
+	deallocate(command);
 
 	terminal_print_new_prompt();
 }
